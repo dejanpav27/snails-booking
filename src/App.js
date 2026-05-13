@@ -8,18 +8,16 @@ import StepConfirm  from './pages/StepConfirm';
 import Success      from './pages/Success';
 
 const STEPS = ['Service', 'Date & time', 'Details', 'Confirm'];
-
 const EMPTY_CLIENT = { name: '', phone: '', email: '', notes: '' };
 
 export default function App() {
-  const [step,     setStep]    = useState(0);
-  const [services, setServices] = useState([]);
-  const [loading,  setLoading]  = useState(true);
+  const [step,       setStep]      = useState(0);
+  const [services,   setServices]  = useState([]);
+  const [loading,    setLoading]   = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error,    setError]    = useState('');
-  const [done,     setDone]     = useState(false);
+  const [error,      setError]     = useState('');
+  const [done,       setDone]      = useState(false);
 
-  // Booking state
   const [service,  setService]  = useState(null);
   const [dateTime, setDateTime] = useState({ date: null, slot: null });
   const [client,   setClient]   = useState(EMPTY_CLIENT);
@@ -33,7 +31,6 @@ export default function App() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Validation for step 2 (details)
   function validateDetails() {
     const e = {};
     if (!client.name.trim())  e.name  = 'Please enter your name';
@@ -43,7 +40,7 @@ export default function App() {
   }
 
   function next() {
-    if (step === 1 && (!dateTime.date || !dateTime.slot)) return; // guard
+    if (step === 1 && (!dateTime.date || !dateTime.slot)) return;
     if (step === 2 && !validateDetails()) return;
     setStep(s => s + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -77,12 +74,11 @@ export default function App() {
     }
   }
 
-  // Can the user proceed from current step?
   const canProceed = [
     !!service,
     !!dateTime.date && !!dateTime.slot,
-    true,  // details validated on click
-    true,  // confirm just submits
+    true,
+    true,
   ][step];
 
   if (loading) return (
@@ -102,7 +98,6 @@ export default function App() {
   return (
     <div style={pageStyle}>
       <Header />
-
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 60px' }}>
         {done ? (
           <Card>
@@ -111,25 +106,11 @@ export default function App() {
         ) : (
           <>
             <StepBar steps={STEPS} current={step} />
-
             <Card style={{ marginBottom: 20 }}>
-              {step === 0 && (
-                <StepService services={services} selected={service} onSelect={s => { setService(s); }} />
-              )}
-              {step === 1 && (
-                <StepDateTime
-                  service={service}
-                  selectedDate={dateTime.date}
-                  selectedSlot={dateTime.slot}
-                  onSelect={({ date, slot }) => setDateTime({ date, slot })}
-                />
-              )}
-              {step === 2 && (
-                <StepDetails form={client} onChange={setClient} errors={errors} />
-              )}
-              {step === 3 && (
-                <StepConfirm service={service} slot={dateTime.slot} client={client} />
-              )}
+              {step === 0 && <StepService services={services} selected={service} onSelect={s => setService(s)} />}
+              {step === 1 && <StepDateTime service={service} selectedDate={dateTime.date} selectedSlot={dateTime.slot} onSelect={({ date, slot }) => setDateTime({ date, slot })} />}
+              {step === 2 && <StepDetails form={client} onChange={setClient} errors={errors} />}
+              {step === 3 && <StepConfirm service={service} slot={dateTime.slot} client={client} />}
             </Card>
 
             {error && (
@@ -138,27 +119,13 @@ export default function App() {
               </div>
             )}
 
-            {/* Navigation buttons */}
             <div style={{ display: 'flex', gap: 10 }}>
               {step > 0 && (
-                <button
-                  onClick={back}
-                  style={{
-                    flex: 1, padding: '13px', fontSize: 15,
-                    background: 'transparent', border: '1px solid var(--p200)',
-                    borderRadius: 'var(--radius-md)', color: 'var(--p700)',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button onClick={back} style={{ flex: 1, padding: '13px', fontSize: 15, background: 'transparent', border: '1px solid var(--p200)', borderRadius: 'var(--radius-md)', color: 'var(--p700)', cursor: 'pointer' }}>
                   ← Back
                 </button>
               )}
-              <Btn
-                onClick={step === STEPS.length - 1 ? submit : next}
-                disabled={!canProceed}
-                loading={submitting}
-                style={{ flex: step > 0 ? 2 : 1 }}
-              >
+              <Btn onClick={step === STEPS.length - 1 ? submit : next} disabled={!canProceed} loading={submitting} style={{ flex: step > 0 ? 2 : 1 }}>
                 {step === STEPS.length - 1 ? 'Confirm booking' : 'Continue →'}
               </Btn>
             </div>
@@ -172,17 +139,18 @@ export default function App() {
 function Header() {
   return (
     <header style={{
-      textAlign: 'center',
-      padding: '32px 20px 24px',
-      borderBottom: '1px solid var(--p200)',
+      background: '#1a0a0f',
+      padding: '16px 20px',
       marginBottom: 28,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, color: 'var(--p800)', letterSpacing: .3 }}>
-        Snails
-      </div>
-      <div style={{ fontSize: 13, color: 'var(--p600)', marginTop: 4 }}>
-        nail studio · book your appointment
-      </div>
+      <img
+        src="/logo.png"
+        alt="Snails — Nails by Sara Pudar"
+        style={{ height: 80, width: 'auto', display: 'block' }}
+      />
     </header>
   );
 }
