@@ -140,7 +140,7 @@ function Header() {
   return (
     <header style={{
       background: '#fff0f5',
-      padding: '2px 20px',
+      padding: '8px 20px',
       marginBottom: 15,
       display: 'flex',
       alignItems: 'center',
@@ -149,7 +149,7 @@ function Header() {
       <img
         src="/logo.png"
         alt="Snails — Nails by Sara Pudar"
-        style={{ height: 120, width: 'auto', display: 'block' }}
+        style={{ height: 80, width: 'auto', display: 'block' }}
       />
     </header>
   );
