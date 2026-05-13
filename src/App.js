@@ -139,7 +139,7 @@ export default function App() {
 function Header() {
   return (
     <header style={{
-      background: '#1a0a0f',
+      background: '#fff0f5',
       padding: '16px 20px',
       marginBottom: 28,
       display: 'flex',
