@@ -149,7 +149,7 @@ function Header() {
       <img
         src="/logo.png"
         alt="Snails — Nails by Sara Pudar"
-        style={{ height: 80, width: 'auto', display: 'block' }}
+        style={{ height: 130, width: 'auto', display: 'block' }}
       />
     </header>
   );
