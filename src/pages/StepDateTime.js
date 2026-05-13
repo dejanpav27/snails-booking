@@ -3,142 +3,116 @@ import {
   startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek,
   addMonths, subMonths, format, isToday, isPast, isSameDay, parseISO,
 } from 'date-fns';
-import { getAvailability } from '../lib/api';
-import { toDateString } from '../lib/utils';
 import { Spinner } from '../components/UI';
 
-export default function StepDateTime({ service, selectedDate, selectedSlot, onSelect }) {
-  const [month,     setMonth]     = useState(new Date());
-  const [date,      setDate]      = useState(selectedDate || null);
-  const [slots,     setSlots]     = useState([]);
-  const [loading,   setLoading]   = useState(false);
-  const [slot,      setSlot]      = useState(selectedSlot || null);
+const BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
-  // When date changes, load slots
+async function fetchAvailability(date, serviceIds) {
+  const res = await fetch(`${BASE}/availability?date=${date}&service_ids=${serviceIds}`);
+  return res.json();
+}
+
+function toDateString(date) {
+  return format(date, 'yyyy-MM-dd');
+}
+
+export default function StepDateTime({ serviceIds, selectedDate, selectedSlot, onSelect }) {
+  const [month,   setMonth]   = useState(new Date());
+  const [date,    setDate]    = useState(selectedDate || null);
+  const [slots,   setSlots]   = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [slot,    setSlot]    = useState(selectedSlot || null);
+
   useEffect(() => {
-    if (!date || !service) return;
+    if (!date || !serviceIds) return;
     setSlots([]); setSlot(null);
     setLoading(true);
-    getAvailability(toDateString(date), service.id)
+    fetchAvailability(toDateString(date), serviceIds)
       .then(d => setSlots(d.available_slots || []))
       .catch(() => setSlots([]))
       .finally(() => setLoading(false));
-  }, [date, service]);
+  }, [date, serviceIds]);
 
-  // Notify parent when both date + slot chosen
   useEffect(() => {
     if (date && slot) onSelect({ date, slot });
   }, [date, slot]); // eslint-disable-line
 
-  // Calendar grid
   const monthStart = startOfMonth(month);
   const monthEnd   = endOfMonth(month);
   const gridStart  = startOfWeek(monthStart, { weekStartsOn: 1 });
   const gridEnd    = endOfWeek(monthEnd,   { weekStartsOn: 1 });
   const allDays    = eachDayOfInterval({ start: gridStart, end: gridEnd });
 
-  function pickDate(d) {
-    setDate(d);
-    setSlot(null);
-  }
+  function pickDate(d) { setDate(d); setSlot(null); }
 
   return (
     <div className="fade-up">
-      <h2 style={{ fontSize: 20, fontWeight: 500, color: 'var(--p800)', marginBottom: 4 }}>
-        Pick a date & time
-      </h2>
+      <h2 style={{ fontSize: 20, fontWeight: 500, color: 'var(--p800)', marginBottom: 4 }}>Pick a date & time</h2>
       <p style={{ fontSize: 14, color: 'var(--p600)', marginBottom: 22 }}>
-        {service.name} · {service.duration_mins} min
+        Available slots based on your selected services
       </p>
 
-      {/* Month nav */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <button onClick={() => setMonth(m => subMonths(m, 1))} style={navBtn}>‹</button>
-        <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--p800)' }}>
-          {format(month, 'MMMM yyyy')}
-        </span>
+        <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--p800)' }}>{format(month, 'MMMM yyyy')}</span>
         <button onClick={() => setMonth(m => addMonths(m, 1))} style={navBtn}>›</button>
       </div>
 
-      {/* Day names */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 2, marginBottom: 4 }}>
         {['Mo','Tu','We','Th','Fr','Sa','Su'].map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: 11, color: 'var(--p400)', padding: '4px 0', fontWeight: 500 }}>{d}</div>
+          <div key={d} style={{ textAlign:'center', fontSize:11, color:'var(--p400)', padding:'4px 0', fontWeight:500 }}>{d}</div>
         ))}
       </div>
 
-      {/* Calendar days */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 3, marginBottom: 22 }}>
         {allDays.map(day => {
           const inMonth  = day.getMonth() === month.getMonth();
           const past     = isPast(day) && !isToday(day);
-          const selected = date && isSameDay(day, date);
+          const sel      = date && isSameDay(day, date);
           const today    = isToday(day);
           const disabled = past || !inMonth;
-
           return (
-            <button
-              key={day.toString()}
-              disabled={disabled}
-              onClick={() => pickDate(day)}
+            <button key={day.toString()} disabled={disabled} onClick={() => pickDate(day)}
               style={{
-                aspectRatio: '1',
-                border: selected ? '2px solid var(--p600)' : '1.5px solid transparent',
-                borderRadius: 'var(--radius-md)',
-                background: selected ? 'var(--p600)'
-                  : today ? 'var(--p100)'
-                  : 'transparent',
-                color: selected ? 'var(--p100)'
-                  : disabled ? 'var(--p200)'
-                  : 'var(--p800)',
-                fontSize: 13,
-                fontWeight: today ? 500 : 400,
-                cursor: disabled ? 'default' : 'pointer',
-                transition: 'all .12s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                aspectRatio:'1', border: sel ? '2px solid var(--p600)' : '1.5px solid transparent',
+                borderRadius:'var(--radius-md)',
+                background: sel ? 'var(--p600)' : today ? 'var(--p100)' : 'transparent',
+                color: sel ? 'var(--p100)' : disabled ? 'var(--p200)' : 'var(--p800)',
+                fontSize:13, fontWeight: today ? 500 : 400,
+                cursor: disabled ? 'default' : 'pointer', transition:'all .12s',
+                display:'flex', alignItems:'center', justifyContent:'center',
               }}
-            >
-              {format(day, 'd')}
-            </button>
+            >{format(day, 'd')}</button>
           );
         })}
       </div>
 
-      {/* Time slots */}
       {date && (
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--p700)', marginBottom: 10 }}>
+          <div style={{ fontSize:13, fontWeight:500, color:'var(--p700)', marginBottom:10 }}>
             Available times — {format(date, 'EEE d MMM')}
           </div>
           {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}><Spinner /></div>
+            <div style={{ display:'flex', justifyContent:'center', padding:24 }}><Spinner /></div>
           ) : slots.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 13, color: 'var(--p400)' }}>
+            <div style={{ textAlign:'center', padding:'20px 0', fontSize:13, color:'var(--p400)' }}>
               No slots available on this day — try another date
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
               {slots.map(s => {
-                const selected = slot === s;
+                const sel = slot === s;
                 return (
-                  <button
-                    key={s}
-                    onClick={() => setSlot(s)}
+                  <button key={s} onClick={() => setSlot(s)}
                     style={{
-                      padding: '10px 4px',
-                      fontSize: 13,
-                      textAlign: 'center',
-                      border: `1.5px solid ${selected ? 'var(--p600)' : 'var(--p200)'}`,
-                      borderRadius: 'var(--radius-md)',
-                      background: selected ? 'var(--p600)' : 'var(--white)',
-                      color: selected ? 'var(--p100)' : 'var(--p700)',
-                      fontWeight: selected ? 500 : 400,
-                      cursor: 'pointer',
-                      transition: 'all .12s',
+                      padding:'10px 4px', fontSize:13, textAlign:'center',
+                      border:`1.5px solid ${sel ? 'var(--p600)' : 'var(--p200)'}`,
+                      borderRadius:'var(--radius-md)',
+                      background: sel ? 'var(--p600)' : '#fff',
+                      color: sel ? 'var(--p100)' : 'var(--p700)',
+                      fontWeight: sel ? 500 : 400, cursor:'pointer', transition:'all .12s',
                     }}
-                  >
-                    {format(parseISO(s), 'HH:mm')}
-                  </button>
+                  >{format(parseISO(s), 'HH:mm')}</button>
                 );
               })}
             </div>
@@ -150,8 +124,8 @@ export default function StepDateTime({ service, selectedDate, selectedSlot, onSe
 }
 
 const navBtn = {
-  background: 'var(--p100)', border: '1px solid var(--p200)',
-  borderRadius: 'var(--radius-md)', width: 34, height: 34,
-  fontSize: 18, color: 'var(--p700)', cursor: 'pointer',
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background:'var(--p100)', border:'1px solid var(--p200)',
+  borderRadius:'var(--radius-md)', width:34, height:34,
+  fontSize:18, color:'var(--p700)', cursor:'pointer',
+  display:'flex', alignItems:'center', justifyContent:'center',
 };
