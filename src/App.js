@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getServices, createBooking } from './lib/api';
+import { getServices, getAvailability, createBooking } from './lib/api';
 import { StepBar, Card, Btn, PageLoader } from './components/UI';
 import StepService  from './pages/StepService';
 import StepDateTime from './pages/StepDateTime';
@@ -7,7 +7,7 @@ import StepDetails  from './pages/StepDetails';
 import StepConfirm  from './pages/StepConfirm';
 import Success      from './pages/Success';
 
-const STEPS = ['Service', 'Date & time', 'Details', 'Confirm'];
+const STEPS = ['Services', 'Date & time', 'Details', 'Confirm'];
 const EMPTY_CLIENT = { name: '', phone: '', email: '', notes: '' };
 
 export default function App() {
@@ -18,11 +18,11 @@ export default function App() {
   const [error,      setError]     = useState('');
   const [done,       setDone]      = useState(false);
 
-  const [service,  setService]  = useState(null);
-  const [dateTime, setDateTime] = useState({ date: null, slot: null });
-  const [client,   setClient]   = useState(EMPTY_CLIENT);
-  const [errors,   setErrors]   = useState({});
-  const [booking,  setBooking]  = useState(null);
+  // selected is now an ARRAY of service objects
+  const [selected,  setSelected]  = useState([]);
+  const [dateTime,  setDateTime]  = useState({ date: null, slot: null });
+  const [client,    setClient]    = useState(EMPTY_CLIENT);
+  const [errors,    setErrors]    = useState({});
 
   useEffect(() => {
     getServices()
@@ -54,8 +54,8 @@ export default function App() {
   async function submit() {
     setSubmitting(true); setError('');
     try {
-      const result = await createBooking({
-        service_id:   service.id,
+      await createBooking({
+        service_ids:  selected.map(s => s.id),
         booked_at:    dateTime.slot,
         client_notes: client.notes || null,
         client: {
@@ -64,7 +64,6 @@ export default function App() {
           email: client.email.trim() || null,
         },
       });
-      setBooking(result.booking);
       setDone(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
@@ -75,18 +74,18 @@ export default function App() {
   }
 
   const canProceed = [
-    !!service,
+    selected.length > 0,
     !!dateTime.date && !!dateTime.slot,
     true,
     true,
   ][step];
 
-  if (loading) return (
-    <div style={pageStyle}>
-      <Header />
-      <PageLoader />
-    </div>
-  );
+  // Pass service_ids to availability checker
+  const availabilityParams = selected.length > 0
+    ? { serviceIds: selected.map(s => s.id).join(',') }
+    : null;
+
+  if (loading) return <div style={pageStyle}><Header /><PageLoader /></div>;
 
   if (error && !services.length) return (
     <div style={pageStyle}>
@@ -101,16 +100,23 @@ export default function App() {
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 60px' }}>
         {done ? (
           <Card>
-            <Success booking={booking} service={service} slot={dateTime.slot} client={client} />
+            <Success services={selected} slot={dateTime.slot} client={client} />
           </Card>
         ) : (
           <>
             <StepBar steps={STEPS} current={step} />
             <Card style={{ marginBottom: 20 }}>
-              {step === 0 && <StepService services={services} selected={service} onSelect={s => setService(s)} />}
-              {step === 1 && <StepDateTime service={service} selectedDate={dateTime.date} selectedSlot={dateTime.slot} onSelect={({ date, slot }) => setDateTime({ date, slot })} />}
+              {step === 0 && <StepService services={services} selected={selected} onSelect={setSelected} />}
+              {step === 1 && availabilityParams && (
+                <StepDateTime
+                  serviceIds={availabilityParams.serviceIds}
+                  selectedDate={dateTime.date}
+                  selectedSlot={dateTime.slot}
+                  onSelect={({ date, slot }) => setDateTime({ date, slot })}
+                />
+              )}
               {step === 2 && <StepDetails form={client} onChange={setClient} errors={errors} />}
-              {step === 3 && <StepConfirm service={service} slot={dateTime.slot} client={client} />}
+              {step === 3 && <StepConfirm services={selected} slot={dateTime.slot} client={client} />}
             </Card>
 
             {error && (
@@ -138,24 +144,10 @@ export default function App() {
 
 function Header() {
   return (
-    <header style={{
-      background: '#fff0f5',
-      padding: '8px 20px',
-      marginBottom: 15,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      <img
-        src="/logo.png"
-        alt="Snails — Nails by Sara Pudar"
-        style={{ height: 80, width: 'auto', display: 'block' }}
-      />
+    <header style={{ background: '#fff0f5', borderBottom: '1px solid #ffd6e7', padding: '8px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <img src="/logo.png" alt="Snails — Nails by Sara Pudar" style={{ height: 110, width: 'auto', display: 'block' }} />
     </header>
   );
 }
 
-const pageStyle = {
-  minHeight: '100vh',
-  background: 'var(--p50)',
-};
+const pageStyle = { minHeight: '100vh', background: 'var(--p50)' };
