@@ -18,12 +18,12 @@ export default function Success({ services, slot, client }) {
         {services.map((s, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--p200)', fontSize: 13 }}>
             <span style={{ color: 'var(--p700)' }}>{s.name}</span>
-            <span style={{ color: 'var(--p800)' }}>{s.duration_mins} min · £{Number(s.price).toFixed(2)}</span>
+            <span style={{ color: 'var(--p800)' }}>{s.duration_mins} min · {Number(s.price).toFixed(0)} RSD</span>
           </div>
         ))}
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0 0', fontSize: 14 }}>
           <span style={{ fontWeight: 500, color: 'var(--p800)' }}>Total · {totalDuration} min</span>
-          <span style={{ fontWeight: 500, color: 'var(--p700)' }}>£{totalPrice.toFixed(2)}</span>
+          <span style={{ fontWeight: 500, color: 'var(--p700)' }}>{totalPrice.toFixed(0)} RSD</span>
         </div>
       </div>
 
@@ -31,7 +31,8 @@ export default function Success({ services, slot, client }) {
         <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--p500)', textTransform: 'uppercase', letterSpacing: .6, marginBottom: 10 }}>Appointment</div>
         {[['Date', format(dt, 'EEEE, d MMMM yyyy')], ['Time', format(dt, 'HH:mm')]].map(([l,v]) => (
           <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--p200)', fontSize: 13 }}>
-            <span style={{ color: 'var(--p600)' }}>{l}</span><span style={{ color: 'var(--p800)' }}>{v}</span>
+            <span style={{ color: 'var(--p600)' }}>{l}</span>
+            <span style={{ color: 'var(--p800)' }}>{v}</span>
           </div>
         ))}
       </div>
