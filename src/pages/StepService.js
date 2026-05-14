@@ -1,5 +1,4 @@
 export default function StepService({ services, selected, onSelect }) {
-  // selected is now an array of service objects
   const selectedIds = selected.map(s => s.id);
 
   function toggle(svc) {
@@ -51,7 +50,6 @@ export default function StepService({ services, selected, onSelect }) {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    {/* Checkbox */}
                     <div style={{
                       width: 20, height: 20, borderRadius: 5,
                       border: `1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p300)'}`,
@@ -67,7 +65,7 @@ export default function StepService({ services, selected, onSelect }) {
                     </div>
                   </div>
                   <span style={{ fontSize: 15, fontWeight: 500, color: 'var(--p700)' }}>
-                    £{Number(svc.price).toFixed(2)}
+                    {Number(svc.price).toFixed(0)} RSD
                   </span>
                 </button>
               );
@@ -76,7 +74,6 @@ export default function StepService({ services, selected, onSelect }) {
         </div>
       ))}
 
-      {/* Summary bar */}
       {selected.length > 0 && (
         <div style={{
           position: 'sticky', bottom: 0,
@@ -94,7 +91,7 @@ export default function StepService({ services, selected, onSelect }) {
             </div>
           </div>
           <div style={{ fontSize: 18, fontWeight: 500 }}>
-            £{totalPrice.toFixed(2)}
+            {totalPrice.toFixed(0)} RSD
           </div>
         </div>
       )}
