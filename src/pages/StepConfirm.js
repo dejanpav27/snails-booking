@@ -15,7 +15,6 @@ export default function StepConfirm({ services, slot, client }) {
         Everything look right?
       </p>
 
-      {/* Services */}
       <div style={{ background: 'var(--p100)', border: '1px solid var(--p200)', borderRadius: 'var(--radius-lg)', padding: '16px 18px', marginBottom: 14 }}>
         <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--p500)', textTransform: 'uppercase', letterSpacing: .6, marginBottom: 10 }}>
           Services
@@ -23,16 +22,15 @@ export default function StepConfirm({ services, slot, client }) {
         {services.map((s, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--p200)', fontSize: 13 }}>
             <span style={{ color: 'var(--p700)' }}>{s.name} <span style={{ color: 'var(--p400)', fontSize: 11 }}>({s.duration_mins} min)</span></span>
-            <span style={{ color: 'var(--p800)', fontWeight: 400 }}>£{Number(s.price).toFixed(2)}</span>
+            <span style={{ color: 'var(--p800)' }}>{Number(s.price).toFixed(0)} RSD</span>
           </div>
         ))}
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0 0', fontSize: 15 }}>
           <span style={{ fontWeight: 500, color: 'var(--p800)' }}>Total · {totalDuration} min</span>
-          <span style={{ fontWeight: 500, color: 'var(--p700)' }}>£{totalPrice.toFixed(2)}</span>
+          <span style={{ fontWeight: 500, color: 'var(--p700)' }}>{totalPrice.toFixed(0)} RSD</span>
         </div>
       </div>
 
-      {/* Date & time */}
       <div style={{ background: '#fff', border: '1px solid var(--p200)', borderRadius: 'var(--radius-lg)', padding: '16px 18px', marginBottom: 14 }}>
         <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--p500)', textTransform: 'uppercase', letterSpacing: .6, marginBottom: 10 }}>
           Appointment
@@ -41,7 +39,6 @@ export default function StepConfirm({ services, slot, client }) {
         <SummaryRow label="Time" value={format(dt, 'HH:mm')} />
       </div>
 
-      {/* Client details */}
       <div style={{ background: '#fff', border: '1px solid var(--p200)', borderRadius: 'var(--radius-lg)', padding: '16px 18px', marginBottom: 24 }}>
         <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--p500)', textTransform: 'uppercase', letterSpacing: .6, marginBottom: 10 }}>
           Your details
