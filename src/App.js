@@ -144,8 +144,8 @@ export default function App() {
 
 function Header() {
   return (
-    <header style={{ background: '#fff0f5', borderBottom: '1px solid #ffd6e7', padding: '12px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <img src="/logo.png" alt="Snails — Nails by Sara Pudar" style={{ height: 120, width: 'auto', display: 'block' }} />
+    <header style={{ background: '#fff0f5', borderBottom: '1px solid #ffd6e7', padding: '4px 20px', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <img src="/logo.png" alt="Snails — Nails by Sara Pudar" style={{ height: 90, width: 'auto', display: 'block' }} />
     </header>
   );
 }
