@@ -1,7 +1,26 @@
+import { useState } from 'react';
 import { Field, FieldArea } from '../components/UI';
+import { lookupClient } from '../lib/api';
 
 export default function StepDetails({ form, onChange, errors }) {
   const set = key => e => onChange({ ...form, [key]: e.target.value });
+  const [prefilled, setPrefilled] = useState(false);
+
+  async function handlePhoneBlur(e) {
+    const phone = e.target.value.trim();
+    if (phone.length < 5) return;
+    const client = await lookupClient(phone);
+    if (client) {
+      onChange({
+        ...form,
+        phone,
+        name:  form.name  || client.name  || '',
+        email: form.email || client.email || '',
+      });
+      setPrefilled(true);
+      setTimeout(() => setPrefilled(false), 3000);
+    }
+  }
 
   return (
     <div className="fade-up">
@@ -14,6 +33,16 @@ export default function StepDetails({ form, onChange, errors }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <Field
+          label="Phone number *"
+          placeholder="+381 60 123 4567"
+          type="tel"
+          value={form.phone}
+          onChange={set('phone')}
+          onBlur={handlePhoneBlur}
+          error={errors?.phone}
+          autoComplete="tel"
+        />
+        <Field
           label="Your name *"
           placeholder="Sofia Martins"
           value={form.name}
@@ -21,15 +50,11 @@ export default function StepDetails({ form, onChange, errors }) {
           error={errors?.name}
           autoComplete="name"
         />
-        <Field
-          label="Phone number *"
-          placeholder="+44 7700 900123"
-          type="tel"
-          value={form.phone}
-          onChange={set('phone')}
-          error={errors?.phone}
-          autoComplete="tel"
-        />
+        {prefilled && (
+          <p style={{ fontSize: 12, color: '#2e7d32', background: '#e8f5e9', borderRadius: 8, padding: '6px 12px', margin: '-8px 0' }}>
+            ✓ Welcome back! We filled in your details.
+          </p>
+        )}
         <Field
           label="Email address"
           placeholder="sofia@example.com"

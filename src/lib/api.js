@@ -20,3 +20,7 @@ export const getAvailability = (date, serviceId) =>
 // Submit a booking
 export const createBooking = (data) =>
   request('/bookings', { method: 'POST', body: JSON.stringify(data) });
+
+// Look up a returning client by phone (for pre-fill)
+export const lookupClient = (phone) =>
+  request(`/clients/lookup?phone=${encodeURIComponent(phone)}`).catch(() => null);
