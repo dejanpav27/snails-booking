@@ -39,7 +39,7 @@ export default function Success({ services, slot, client }) {
 
       {client.email && (
         <p style={{ fontSize: 13, color: 'var(--p500)', marginBottom: 24, lineHeight: 1.6 }}>
-          A confirmation has been sent to <strong style={{ color: 'var(--p700)' }}>{client.email}</strong>
+          A confirmation email will be sent to <strong style={{ color: 'var(--p700)' }}>{client.email}</strong>
         </p>
       )}
 
