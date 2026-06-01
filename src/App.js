@@ -34,7 +34,11 @@ export default function App() {
   function validateDetails() {
     const e = {};
     if (!client.name.trim())  e.name  = 'Please enter your name';
-    if (!client.phone.trim()) e.phone = 'Please enter your phone number';
+    if (!client.phone.trim()) {
+      e.phone = 'Please enter your phone number';
+    } else if (!/^[+\d\s\-().]{7,20}$/.test(client.phone.trim())) {
+      e.phone = 'Please enter a valid phone number';
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   }
