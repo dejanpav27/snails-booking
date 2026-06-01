@@ -12,6 +12,7 @@ const EMPTY_CLIENT = { name: '', phone: '', email: '', notes: '' };
 
 export default function App() {
   const [step,       setStep]      = useState(0);
+  const [dir, setDir] = useState('right'); // animation direction
   const [services,   setServices]  = useState([]);
   const [loading,    setLoading]   = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -34,16 +35,13 @@ export default function App() {
   function validateDetails() {
     const e = {};
     if (!client.name.trim())  e.name  = 'Please enter your name';
-    if (!client.phone.trim()) {
-      e.phone = 'Please enter your phone number';
-    } else if (!/^[+\d\s\-().]{7,20}$/.test(client.phone.trim())) {
-      e.phone = 'Please enter a valid phone number';
-    }
+    if (!client.phone.trim()) e.phone = 'Please enter your phone number';
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
   function next() {
+    setDir('right');
     if (step === 1 && (!dateTime.date || !dateTime.slot)) return;
     if (step === 2 && !validateDetails()) return;
     setStep(s => s + 1);
@@ -51,6 +49,7 @@ export default function App() {
   }
 
   function back() {
+    setDir('left');
     setStep(s => s - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -110,6 +109,7 @@ export default function App() {
           <>
             <StepBar steps={STEPS} current={step} />
             <Card style={{ marginBottom: 20 }}>
+              <div key={step} className={dir === 'right' ? 'slide-right' : 'slide-left'}>
               {step === 0 && <StepService services={services} selected={selected} onSelect={setSelected} />}
               {step === 1 && availabilityParams && (
                 <StepDateTime
@@ -121,6 +121,7 @@ export default function App() {
               )}
               {step === 2 && <StepDetails form={client} onChange={setClient} errors={errors} />}
               {step === 3 && <StepConfirm services={selected} slot={dateTime.slot} client={client} />}
+              </div>
             </Card>
 
             {error && (

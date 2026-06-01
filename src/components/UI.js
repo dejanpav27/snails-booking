@@ -18,7 +18,7 @@ export function PageLoader() {
   );
 }
 
-/* Step progress bar */
+/* Animated step progress bar */
 export function StepBar({ steps, current }) {
   return (
     <div style={{ display: 'flex', gap: 0, marginBottom: 28 }}>
@@ -29,10 +29,19 @@ export function StepBar({ steps, current }) {
           <div key={label} style={{ flex: 1, textAlign: 'center', position: 'relative' }}>
             <div style={{
               height: 3,
-              background: done || active ? 'var(--p600)' : 'var(--p200)',
+              background: 'var(--p200)',
               marginBottom: 6,
-              transition: 'background .3s',
-            }} />
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}>
+              <div style={{
+                height: '100%',
+                width: done || active ? '100%' : '0%',
+                background: done ? 'var(--p600)' : active ? 'var(--p400)' : 'transparent',
+                transition: 'width .4s cubic-bezier(.4,0,.2,1), background .3s ease',
+                borderRadius: 2,
+              }} />
+            </div>
             <div style={{
               fontSize: 11,
               fontWeight: active ? 500 : 400,
@@ -84,7 +93,7 @@ export function Btn({ children, loading, disabled, onClick, type = 'button', sty
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        transition: 'background .15s',
+        transition: 'background .15s, transform .1s',
         ...style,
       }}
     >
@@ -109,6 +118,7 @@ export function Field({ label, error, ...props }) {
           borderRadius: 'var(--radius-md)',
           outline: 'none',
           width: '100%',
+          transition: 'border-color .15s',
         }}
         onFocus={e  => e.target.style.borderColor = 'var(--p400)'}
         onBlur={e   => e.target.style.borderColor = error ? '#fca5a5' : 'var(--p200)'}
@@ -136,6 +146,7 @@ export function FieldArea({ label, ...props }) {
           outline: 'none',
           width: '100%',
           resize: 'vertical',
+          transition: 'border-color .15s',
         }}
         onFocus={e => e.target.style.borderColor = 'var(--p400)'}
         onBlur={e  => e.target.style.borderColor = 'var(--p200)'}

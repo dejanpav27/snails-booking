@@ -1,13 +1,57 @@
+import { useEffect, useRef } from 'react';
 import { format, parseISO } from 'date-fns';
 
+const SPARKLE_COLORS = ['#d4537e', '#f97db5', '#ffd6e7', '#993556', '#ffb3d1'];
+
+function createSparkle(container) {
+  const el = document.createElement('div');
+  const size = Math.random() * 10 + 6;
+  const x = Math.random() * 300 - 150;
+  const y = Math.random() * -200 - 50;
+  el.style.cssText = `
+    position: absolute;
+    width: ${size}px;
+    height: ${size}px;
+    left: calc(50% + ${x}px);
+    top: 80px;
+    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+    background: ${SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)]};
+    pointer-events: none;
+    animation: sparkle ${Math.random() * 0.6 + 0.6}s ease forwards;
+    transform-origin: center;
+    rotate: ${Math.random() * 360}deg;
+    translate: 0 ${y}px;
+  `;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
 export default function Success({ services, slot, client }) {
+  const containerRef = useRef(null);
   const dt = parseISO(slot);
   const totalPrice    = services.reduce((sum, s) => sum + Number(s.price), 0);
   const totalDuration = services.reduce((sum, s) => sum + s.duration_mins, 0);
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+    let count = 0;
+    const interval = setInterval(() => {
+      createSparkle(containerRef.current);
+      count++;
+      if (count >= 30) clearInterval(interval);
+    }, 60);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="fade-up" style={{ textAlign: 'center', padding: '20px 0' }}>
-      <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--p600)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32, color: 'var(--p100)' }}>
+    <div ref={containerRef} className="fade-up" style={{ textAlign: 'center', padding: '20px 0', position: 'relative', overflow: 'hidden' }}>
+      <div style={{
+        width: 72, height: 72, borderRadius: '50%',
+        background: 'var(--p600)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        margin: '0 auto 20px', fontSize: 32, color: 'var(--p100)',
+        animation: 'pop .5s ease',
+      }}>
         ✓
       </div>
       <h2 style={{ fontSize: 24, fontWeight: 500, color: 'var(--p800)', marginBottom: 6 }}>You're all booked!</h2>
@@ -47,7 +91,7 @@ export default function Success({ services, slot, client }) {
         Need to cancel or reschedule? Please give at least 24 hours notice.
       </p>
 
-      <button onClick={() => window.location.reload()} style={{ marginTop: 28, padding: '11px 24px', background: 'transparent', border: '1px solid var(--p300)', borderRadius: 'var(--radius-md)', color: 'var(--p700)', fontSize: 14, cursor: 'pointer' }}>
+      <button onClick={() => window.location.reload()} style={{ marginTop: 28, padding: '11px 24px', background: 'transparent', border: '1px solid var(--p300)', borderRadius: 'var(--radius-md)', color: 'var(--p700)', fontSize: 14, cursor: 'pointer', transition: 'border-color .15s, color .15s' }}>
         Book another appointment
       </button>
     </div>

@@ -1,7 +1,18 @@
+import { useRef } from 'react';
+
 export default function StepService({ services, selected, onSelect }) {
   const selectedIds = selected.map(s => s.id);
+  const btnRefs = useRef({});
 
   function toggle(svc) {
+    // Pop animation on select
+    const el = btnRefs.current[svc.id];
+    if (el && !selectedIds.includes(svc.id)) {
+      el.classList.remove('service-selected');
+      void el.offsetWidth; // reflow
+      el.classList.add('service-selected');
+      setTimeout(() => el.classList.remove('service-selected'), 350);
+    }
     if (selectedIds.includes(svc.id)) {
       onSelect(selected.filter(s => s.id !== svc.id));
     } else {
@@ -32,12 +43,13 @@ export default function StepService({ services, selected, onSelect }) {
           <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--p500)', textTransform: 'uppercase', letterSpacing: .8, marginBottom: 10 }}>
             {category}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="service-grid" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {svcs.map(svc => {
               const isSelected = selectedIds.includes(svc.id);
               return (
                 <button
                   key={svc.id}
+                  ref={el => btnRefs.current[svc.id] = el}
                   onClick={() => toggle(svc)}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -46,7 +58,9 @@ export default function StepService({ services, selected, onSelect }) {
                     border: `1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p200)'}`,
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer', textAlign: 'left',
-                    transition: 'all .15s', width: '100%',
+                    transition: 'border-color .15s, background .15s, box-shadow .15s',
+                    width: '100%',
+                    boxShadow: isSelected ? '0 0 0 3px rgba(212,83,126,.12)' : 'none',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -75,7 +89,7 @@ export default function StepService({ services, selected, onSelect }) {
       ))}
 
       {selected.length > 0 && (
-        <div style={{
+        <div className="scale-in" style={{
           position: 'sticky', bottom: 0,
           background: 'var(--p800)', color: 'var(--p100)',
           borderRadius: 'var(--radius-md)', padding: '12px 16px',
