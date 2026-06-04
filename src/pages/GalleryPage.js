@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 
 const BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-const CATS = ['All', 'Manicure', 'Pedicure', 'Gel', 'Acrylic', 'Nail art', 'Extras'];
 
 export default function GalleryPage({ onBook }) {
   const [photos,   setPhotos]   = useState([]);
@@ -17,16 +16,17 @@ export default function GalleryPage({ onBook }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = filter === 'All' ? photos : photos.filter(p => p.category === filter);
   const usedCats = ['All', ...new Set(photos.map(p => p.category).filter(Boolean))];
+  const filtered  = filter === 'All' ? photos : photos.filter(p => p.category === filter);
 
   return (
-    <div className="fade-up">
+    /* No fade-up animation — causes white flash on iOS */
+    <div>
       <h2 style={{ fontSize:18, fontWeight:500, color:'var(--p800)', marginBottom:3 }}>Sara's work</h2>
       <p style={{ fontSize:13, color:'var(--p600)', marginBottom:16 }}>Browse designs before you book ✦</p>
 
       {/* Filter pills */}
-      <div style={{ display:'flex', gap:6, marginBottom:16, overflowX:'auto', paddingBottom:4 }}>
+      <div style={{ display:'flex', gap:6, marginBottom:16, overflowX:'auto', paddingBottom:4, WebkitOverflowScrolling:'touch' }}>
         {usedCats.map(cat => (
           <button key={cat} onClick={() => setFilter(cat)} style={{
             fontSize:11, fontWeight:500, padding:'5px 14px',
@@ -48,18 +48,20 @@ export default function GalleryPage({ onBook }) {
           </svg>
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign:'center', padding:'32px 0', color:'var(--p400)', fontSize:13 }}>
-          No photos yet
-        </div>
+        <div style={{ textAlign:'center', padding:'32px 0', color:'var(--p400)', fontSize:13 }}>No photos yet</div>
       ) : (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
-          {filtered.map((p, i) => (
+          {filtered.map(p => (
             <div key={p.id} onClick={() => setLightbox(p)} style={{
               borderRadius:10, overflow:'hidden', position:'relative',
               aspectRatio:'1', cursor:'pointer',
-              animation:`scaleIn .2s ease both ${i * 0.04}s`,
             }}>
-              <img src={p.image_url} alt={p.caption || p.category || ''} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+              <img
+                src={p.image_url}
+                alt={p.caption || p.category || ''}
+                style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+                loading="lazy"
+              />
               {p.category && (
                 <div style={{ position:'absolute', bottom:4, left:4, background:'rgba(114,36,62,.7)', color:'#ffd6e7', fontSize:9, fontWeight:500, padding:'2px 6px', borderRadius:6 }}>
                   {p.category}
@@ -70,7 +72,6 @@ export default function GalleryPage({ onBook }) {
         </div>
       )}
 
-      {/* Book CTA */}
       <button onClick={onBook} style={{
         width:'100%', marginTop:20, padding:'14px',
         background:'var(--p600)', color:'#fff', border:'none',
@@ -89,7 +90,6 @@ export default function GalleryPage({ onBook }) {
           background:'rgba(0,0,0,.85)',
           display:'flex', alignItems:'center', justifyContent:'center',
           zIndex:9999, padding:20,
-          animation:'fadeUp .2s ease',
         }}>
           <div onClick={e => e.stopPropagation()} style={{ maxWidth:400, width:'100%', position:'relative' }}>
             <img src={lightbox.image_url} alt={lightbox.caption || ''} style={{ width:'100%', borderRadius:16, display:'block' }} />
