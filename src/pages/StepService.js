@@ -5,11 +5,10 @@ export default function StepService({ services, selected, onSelect }) {
   const btnRefs = useRef({});
 
   function toggle(svc) {
-    // Pop animation on select
     const el = btnRefs.current[svc.id];
     if (el && !selectedIds.includes(svc.id)) {
       el.classList.remove('service-selected');
-      void el.offsetWidth; // reflow
+      void el.offsetWidth;
       el.classList.add('service-selected');
       setTimeout(() => el.classList.remove('service-selected'), 350);
     }
@@ -31,19 +30,17 @@ export default function StepService({ services, selected, onSelect }) {
 
   return (
     <div className="fade-up">
-      <h2 style={{ fontSize: 20, fontWeight: 500, color: 'var(--p800)', marginBottom: 4 }}>
-        Choose your services
-      </h2>
-      <p style={{ fontSize: 14, color: 'var(--p600)', marginBottom: 22 }}>
-        You can select multiple services — they'll be done back to back in one visit.
+      <h2 style={{ fontSize:18, fontWeight:500, color:'var(--p800)', marginBottom:3 }}>Choose your services</h2>
+      <p style={{ fontSize:13, color:'var(--p600)', marginBottom:18 }}>
+        Select one or more — done back to back in one visit.
       </p>
 
       {Object.entries(groups).map(([category, svcs]) => (
-        <div key={category} style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--p500)', textTransform: 'uppercase', letterSpacing: .8, marginBottom: 10 }}>
+        <div key={category} style={{ marginBottom:18 }}>
+          <div style={{ fontSize:10, fontWeight:600, color:'var(--p500)', textTransform:'uppercase', letterSpacing:.8, marginBottom:8 }}>
             {category}
           </div>
-          <div className="service-grid" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="service-grid" style={{ display:'flex', flexDirection:'column', gap:8 }}>
             {svcs.map(svc => {
               const isSelected = selectedIds.includes(svc.id);
               return (
@@ -52,33 +49,47 @@ export default function StepService({ services, selected, onSelect }) {
                   ref={el => btnRefs.current[svc.id] = el}
                   onClick={() => toggle(svc)}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '14px 16px',
+                    display:'flex', alignItems:'center', justifyContent:'space-between',
+                    padding:'14px 16px', width:'100%',
                     background: isSelected ? 'var(--p100)' : '#fff',
-                    border: `1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p200)'}`,
-                    borderRadius: 'var(--radius-md)',
-                    cursor: 'pointer', textAlign: 'left',
-                    transition: 'border-color .15s, background .15s, box-shadow .15s',
-                    width: '100%',
+                    border:`1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p200)'}`,
+                    borderRadius:'var(--radius-md)',
+                    cursor:'pointer', textAlign:'left',
+                    transition:'all .15s',
                     boxShadow: isSelected ? '0 0 0 3px rgba(212,83,126,.12)' : 'none',
+                    position:'relative', overflow:'hidden',
+                    WebkitTapHighlightColor: 'transparent',
+                    fontFamily:'inherit',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {/* Faded background image */}
+                  {svc.image_url && (
                     <div style={{
-                      width: 20, height: 20, borderRadius: 5,
-                      border: `1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p300)'}`,
+                      position:'absolute', inset:0,
+                      backgroundImage:`url(${svc.image_url})`,
+                      backgroundSize:'cover', backgroundPosition:'center',
+                      opacity: isSelected ? .12 : .07,
+                      transition:'opacity .2s',
+                      pointerEvents:'none',
+                    }} />
+                  )}
+
+                  <div style={{ display:'flex', alignItems:'center', gap:10, position:'relative', zIndex:1 }}>
+                    <div style={{
+                      width:22, height:22, borderRadius:6, flexShrink:0,
+                      border:`1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p300)'}`,
                       background: isSelected ? 'var(--p600)' : '#fff',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0, transition: 'all .15s',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      transition:'all .15s',
                     }}>
-                      {isSelected && <span style={{ color: '#fff', fontSize: 12, fontWeight: 700 }}>✓</span>}
+                      {isSelected && <span style={{ color:'#fff', fontSize:12, fontWeight:700 }}>✓</span>}
                     </div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--p800)' }}>{svc.name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--p500)', marginTop: 2 }}>{svc.duration_mins} min</div>
+                      <div style={{ fontSize:14, fontWeight:500, color:'var(--p800)' }}>{svc.name}</div>
+                      <div style={{ fontSize:11, color:'var(--p500)', marginTop:2 }}>{svc.duration_mins} min</div>
                     </div>
                   </div>
-                  <span style={{ fontSize: 15, fontWeight: 500, color: 'var(--p700)' }}>
+                  <span style={{ fontSize:15, fontWeight:500, color:'var(--p700)', position:'relative', zIndex:1 }}>
                     {Number(svc.price).toFixed(0)} RSD
                   </span>
                 </button>
@@ -90,23 +101,19 @@ export default function StepService({ services, selected, onSelect }) {
 
       {selected.length > 0 && (
         <div className="scale-in" style={{
-          position: 'sticky', bottom: 0,
-          background: 'var(--p800)', color: 'var(--p100)',
-          borderRadius: 'var(--radius-md)', padding: '12px 16px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginTop: 8,
+          position:'sticky', bottom:0,
+          background:'var(--p800)', color:'var(--p100)',
+          borderRadius:'var(--radius-md)', padding:'12px 16px',
+          display:'flex', justifyContent:'space-between', alignItems:'center',
+          marginTop:8,
         }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 500 }}>
+            <div style={{ fontSize:13, fontWeight:500 }}>
               {selected.length} service{selected.length > 1 ? 's' : ''} selected
             </div>
-            <div style={{ fontSize: 12, color: 'var(--p300)', marginTop: 2 }}>
-              {totalDuration} min total
-            </div>
+            <div style={{ fontSize:11, color:'var(--p300)', marginTop:2 }}>{totalDuration} min total</div>
           </div>
-          <div style={{ fontSize: 18, fontWeight: 500 }}>
-            {totalPrice.toFixed(0)} RSD
-          </div>
+          <div style={{ fontSize:16, fontWeight:500 }}>{totalPrice.toFixed(0)} RSD</div>
         </div>
       )}
     </div>
