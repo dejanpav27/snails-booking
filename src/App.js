@@ -12,7 +12,7 @@ const STEPS = ['Services', 'Date & time', 'Details', 'Confirm'];
 const EMPTY_CLIENT = { name: '', phone: '', email: '', notes: '' };
 
 export default function App() {
-  const [view,       setView]      = useState('book'); // 'book' | 'gallery'
+  const [view,       setView]      = useState('book');
   const [step,       setStep]      = useState(0);
   const [dir,        setDir]       = useState('right');
   const [services,   setServices]  = useState([]);
@@ -75,13 +75,19 @@ export default function App() {
   const canProceed = [selected.length > 0, !!dateTime.date && !!dateTime.slot, true, true][step];
   const serviceIds = selected.map(s => s.id).join(',');
 
+  const cardStyle = {
+    background: '#fff',
+    borderRadius: 20,
+    padding: '20px 18px',
+    boxShadow: '0 8px 40px rgba(114,36,62,.1)',
+    border: '1px solid rgba(255,214,231,.5)',
+  };
+
   return (
     <div style={{ minHeight:'100vh', background:'#f9eef3', display:'flex', flexDirection:'column', alignItems:'center', padding:'0 12px 80px', position:'relative' }}>
-      {/* BG orbs */}
       <div style={{ position:'fixed', top:-80, left:-80, width:300, height:300, borderRadius:'50%', background:'rgba(180,120,140,.08)', filter:'blur(50px)', pointerEvents:'none', zIndex:0 }} />
       <div style={{ position:'fixed', bottom:-60, right:-60, width:260, height:260, borderRadius:'50%', background:'rgba(180,120,140,.08)', filter:'blur(50px)', pointerEvents:'none', zIndex:0 }} />
 
-      {/* Logo */}
       <div style={{ width:'100%', maxWidth:520, textAlign:'center', paddingTop:20, marginBottom:4, position:'relative', zIndex:1 }}>
         <img src="/logo.png" alt="Snails" style={{ height:64, width:'auto', display:'block', margin:'0 auto' }} />
       </div>
@@ -89,7 +95,7 @@ export default function App() {
 
       {/* Tabs */}
       {!done && (
-        <div style={{ display:'flex', background:'rgba(255,255,255,.65)', backdropFilter:'blur(8px)', borderRadius:99, padding:3, gap:3, marginBottom:14, border:'1px solid rgba(255,214,231,.4)', position:'relative', zIndex:1 }}>
+        <div style={{ display:'flex', background:'rgba(255,255,255,.9)', borderRadius:99, padding:3, gap:3, marginBottom:14, border:'1px solid rgba(255,214,231,.6)', position:'relative', zIndex:1 }}>
           {[['book','Book'],['gallery','Gallery']].map(([v, label]) => (
             <button key={v} onClick={() => setView(v)} style={{
               padding:'7px 20px', fontSize:13, fontWeight:500, border:'none',
@@ -102,27 +108,24 @@ export default function App() {
         </div>
       )}
 
-      {/* Content */}
       <div style={{ width:'100%', maxWidth:520, position:'relative', zIndex:1 }}>
         {loading ? (
           <div style={{ display:'flex', justifyContent:'center', padding:60 }}><Spinner size={32} /></div>
         ) : view === 'gallery' ? (
-          <div style={{ background:'rgba(255,255,255,.9)', backdropFilter:'blur(12px)', borderRadius:20, padding:'20px 18px', boxShadow:'0 8px 40px rgba(114,36,62,.1)', border:'1px solid rgba(255,214,231,.5)' }}>
+          <div style={cardStyle}>
             <GalleryPage onBook={() => setView('book')} />
           </div>
         ) : done ? (
-          <div style={{ background:'rgba(255,255,255,.9)', backdropFilter:'blur(12px)', borderRadius:20, padding:'24px 20px', boxShadow:'0 8px 40px rgba(114,36,62,.1)', border:'1px solid rgba(255,214,231,.5)' }}>
+          <div style={cardStyle}>
             <Success services={selected} slot={dateTime.slot} client={client} />
           </div>
         ) : (
           <>
-            {/* Step bar */}
-            <div style={{ background:'rgba(255,255,255,.65)', backdropFilter:'blur(8px)', borderRadius:14, padding:'12px 16px', marginBottom:10, border:'1px solid rgba(255,214,231,.4)' }}>
+            <div style={{ background:'rgba(255,255,255,.9)', borderRadius:14, padding:'12px 16px', marginBottom:10, border:'1px solid rgba(255,214,231,.4)' }}>
               <StepBar steps={STEPS} current={step} />
             </div>
 
-            {/* Step card */}
-            <div key={step} className={dir === 'right' ? 'slide-right' : 'slide-left'} style={{ background:'rgba(255,255,255,.9)', backdropFilter:'blur(12px)', borderRadius:20, padding:'20px 18px 16px', boxShadow:'0 8px 40px rgba(114,36,62,.1)', marginBottom:12, border:'1px solid rgba(255,214,231,.5)' }}>
+            <div key={step} className={dir === 'right' ? 'slide-right' : 'slide-left'} style={{ ...cardStyle, marginBottom:12, padding:'20px 18px 16px' }}>
               {step === 0 && <StepService services={services} selected={selected} onSelect={setSelected} />}
               {step === 1 && selected.length > 0 && (
                 <StepDateTime serviceIds={serviceIds} selectedDate={dateTime.date} selectedSlot={dateTime.slot} onSelect={({ date, slot }) => setDateTime({ date, slot })} />
@@ -135,7 +138,7 @@ export default function App() {
 
             <div style={{ display:'flex', gap:10 }}>
               {step > 0 && (
-                <button onClick={back} style={{ flex:1, padding:'14px', fontSize:15, fontFamily:'inherit', background:'rgba(255,255,255,.8)', backdropFilter:'blur(8px)', border:'1.5px solid rgba(255,214,231,.9)', borderRadius:99, color:'var(--p700)', cursor:'pointer', minHeight:52, WebkitTapHighlightColor:'transparent' }}>← Back</button>
+                <button onClick={back} style={{ flex:1, padding:'14px', fontSize:15, fontFamily:'inherit', background:'rgba(255,255,255,.9)', border:'1.5px solid rgba(255,214,231,.9)', borderRadius:99, color:'var(--p700)', cursor:'pointer', minHeight:52, WebkitTapHighlightColor:'transparent' }}>← Back</button>
               )}
               <Btn onClick={step === STEPS.length - 1 ? submit : next} disabled={!canProceed} loading={submitting} style={{ flex: step > 0 ? 2 : 1, minHeight:52 }}>
                 {step === STEPS.length - 1 ? 'Confirm booking' : 'Continue →'}
