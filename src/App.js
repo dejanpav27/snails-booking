@@ -85,9 +85,7 @@ export default function App() {
     true,
   ][step];
 
-  const availabilityParams = selected.length > 0
-    ? { serviceIds: selected.map(s => s.id).join(',') }
-    : null;
+  const serviceIds = selected.map(s => s.id).join(',');
 
   return (
     <div style={{
@@ -96,55 +94,50 @@ export default function App() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      padding: '0 16px 48px',
+      padding: '0 12px 80px',
       position: 'relative',
     }}>
       {/* Background orbs */}
-      <div style={{ position:'fixed', top:-80, left:-80, width:320, height:320, borderRadius:'50%', background:'rgba(180,120,140,.08)', filter:'blur(50px)', pointerEvents:'none', zIndex:0 }} />
-      <div style={{ position:'fixed', bottom:-60, right:-60, width:280, height:280, borderRadius:'50%', background:'rgba(180,120,140,.08)', filter:'blur(50px)', pointerEvents:'none', zIndex:0 }} />
-      <div style={{ position:'fixed', top:'40%', right:-100, width:200, height:350, borderRadius:'50%', background:'rgba(180,120,140,.05)', filter:'blur(60px)', pointerEvents:'none', zIndex:0 }} />
+      <div style={{ position:'fixed', top:-80, left:-80, width:300, height:300, borderRadius:'50%', background:'rgba(180,120,140,.08)', filter:'blur(50px)', pointerEvents:'none', zIndex:0 }} />
+      <div style={{ position:'fixed', bottom:-60, right:-60, width:260, height:260, borderRadius:'50%', background:'rgba(180,120,140,.08)', filter:'blur(50px)', pointerEvents:'none', zIndex:0 }} />
 
       {/* Header */}
-      <div style={{ width:'100%', maxWidth:520, textAlign:'center', paddingTop:24, marginBottom:4, position:'relative', zIndex:1, animation:'slideUp .35s ease both' }}>
-        <img src="/logo.png" alt="Snails — Nails by Sara Pudar" style={{ height:76, width:'auto', display:'block', margin:'0 auto' }} />
+      <div style={{ width:'100%', maxWidth:520, textAlign:'center', paddingTop:20, marginBottom:4, position:'relative', zIndex:1 }}>
+        <img src="/logo.png" alt="Snails" style={{ height:64, width:'auto', display:'block', margin:'0 auto' }} />
       </div>
-      <div style={{ fontSize:12, color:'var(--p500)', marginBottom:18, position:'relative', zIndex:1 }}>✦</div>
+      <div style={{ fontSize:12, color:'var(--p500)', marginBottom:14, position:'relative', zIndex:1 }}>✦</div>
 
       {/* Content */}
       <div style={{ width:'100%', maxWidth:520, position:'relative', zIndex:1 }}>
         {loading ? (
           <div style={{ display:'flex', justifyContent:'center', padding:60 }}><Spinner size={32} /></div>
         ) : error && !services.length ? (
-          <div style={{ background:'rgba(255,255,255,.85)', borderRadius:20, padding:'32px 24px', textAlign:'center', fontSize:14, color:'var(--p600)', backdropFilter:'blur(10px)' }}>{error}</div>
+          <div style={{ background:'rgba(255,255,255,.85)', borderRadius:20, padding:'32px 20px', textAlign:'center', fontSize:14, color:'var(--p600)' }}>{error}</div>
         ) : done ? (
-          <div style={{ background:'rgba(255,255,255,.88)', backdropFilter:'blur(12px)', borderRadius:22, padding:'28px', boxShadow:'0 8px 40px rgba(114,36,62,.1)', animation:'slideUp .35s ease both', border:'1px solid rgba(255,214,231,.5)' }}>
+          <div style={{ background:'rgba(255,255,255,.9)', backdropFilter:'blur(12px)', borderRadius:20, padding:'24px 20px', boxShadow:'0 8px 40px rgba(114,36,62,.1)', border:'1px solid rgba(255,214,231,.5)' }}>
             <Success services={selected} slot={dateTime.slot} client={client} />
           </div>
         ) : (
           <>
             {/* Step bar */}
-            <div style={{ background:'rgba(255,255,255,.65)', backdropFilter:'blur(8px)', borderRadius:16, padding:'14px 20px', marginBottom:12, boxShadow:'0 2px 12px rgba(114,36,62,.06)', border:'1px solid rgba(255,214,231,.4)', animation:'slideUp .35s ease both .05s' }}>
+            <div style={{ background:'rgba(255,255,255,.65)', backdropFilter:'blur(8px)', borderRadius:14, padding:'12px 16px', marginBottom:10, border:'1px solid rgba(255,214,231,.4)' }}>
               <StepBar steps={STEPS} current={step} />
             </div>
 
             {/* Step card */}
-            <div
-              key={step}
-              className={dir === 'right' ? 'slide-right' : 'slide-left'}
-              style={{
-                background:'rgba(255,255,255,.88)',
-                backdropFilter:'blur(12px)',
-                borderRadius:22,
-                padding:'22px 22px 18px',
-                boxShadow:'0 8px 40px rgba(114,36,62,.1)',
-                marginBottom:14,
-                border:'1px solid rgba(255,214,231,.5)',
-              }}
-            >
+            <div key={step} className={dir === 'right' ? 'slide-right' : 'slide-left'} style={{
+              background:'rgba(255,255,255,.9)',
+              backdropFilter:'blur(12px)',
+              borderRadius:20,
+              padding:'20px 18px 16px',
+              boxShadow:'0 8px 40px rgba(114,36,62,.1)',
+              marginBottom:12,
+              border:'1px solid rgba(255,214,231,.5)',
+            }}>
               {step === 0 && <StepService services={services} selected={selected} onSelect={setSelected} />}
-              {step === 1 && availabilityParams && (
+              {step === 1 && selected.length > 0 && (
                 <StepDateTime
-                  serviceIds={availabilityParams.serviceIds}
+                  serviceIds={serviceIds}
                   selectedDate={dateTime.date}
                   selectedSlot={dateTime.slot}
                   onSelect={({ date, slot }) => setDateTime({ date, slot })}
@@ -155,33 +148,28 @@ export default function App() {
             </div>
 
             {error && (
-              <div style={{ background:'#fee2e2', border:'1px solid #fca5a5', borderRadius:12, padding:'10px 16px', fontSize:14, color:'#dc2626', marginBottom:12 }}>
+              <div style={{ background:'#fee2e2', border:'1px solid #fca5a5', borderRadius:12, padding:'10px 14px', fontSize:14, color:'#dc2626', marginBottom:10 }}>
                 {error}
               </div>
             )}
 
-            {/* Buttons */}
-            <div style={{ display:'flex', gap:10 }}>
+            {/* Buttons — fixed on mobile */}
+            <div className="safe-bottom" style={{ display:'flex', gap:10 }}>
               {step > 0 && (
                 <button onClick={back} style={{
-                  flex:1, padding:'13px', fontSize:15, fontFamily:'inherit',
-                  background:'rgba(255,255,255,.75)', backdropFilter:'blur(8px)',
+                  flex:1, padding:'14px', fontSize:15, fontFamily:'inherit',
+                  background:'rgba(255,255,255,.8)', backdropFilter:'blur(8px)',
                   border:'1.5px solid rgba(255,214,231,.9)', borderRadius:99,
                   color:'var(--p700)', cursor:'pointer',
-                  transition:'background .18s, transform .1s',
-                  boxShadow:'0 2px 8px rgba(114,36,62,.06)',
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,.95)'}
-                  onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,.75)'}
-                  onMouseDown={e => e.currentTarget.style.transform='scale(.97)'}
-                  onMouseUp={e => e.currentTarget.style.transform=''}
-                >← Back</button>
+                  WebkitTapHighlightColor: 'transparent',
+                  minHeight: 52,
+                }}>← Back</button>
               )}
               <Btn
                 onClick={step === STEPS.length - 1 ? submit : next}
                 disabled={!canProceed}
                 loading={submitting}
-                style={{ flex: step > 0 ? 2 : 1 }}
+                style={{ flex: step > 0 ? 2 : 1, minHeight: 52 }}
               >
                 {step === STEPS.length - 1 ? 'Confirm booking' : 'Continue →'}
               </Btn>
@@ -191,7 +179,7 @@ export default function App() {
       </div>
 
       {/* Footer */}
-      <div style={{ textAlign:'center', marginTop:24, position:'relative', zIndex:1 }}>
+      <div style={{ textAlign:'center', marginTop:20, position:'relative', zIndex:1 }}>
         <p style={{ fontSize:12, color:'var(--p700)', fontWeight:500 }}>Snails Nail Studio</p>
         <p style={{ fontSize:11, color:'var(--p500)', marginTop:3 }}>✦</p>
       </div>
