@@ -62,13 +62,12 @@ export default function StepService({ services, selected, onSelect }) {
                     fontFamily:'inherit',
                   }}
                 >
-                  {/* Faded background image */}
                   {svc.image_url && (
                     <div style={{
                       position:'absolute', inset:0,
                       backgroundImage:`url(${svc.image_url})`,
                       backgroundSize:'cover', backgroundPosition:'center',
-                      opacity: isSelected ? .28 : .20,
+                      opacity: isSelected ? .60 : .50,
                       transition:'opacity .2s',
                       pointerEvents:'none',
                     }} />
@@ -78,18 +77,18 @@ export default function StepService({ services, selected, onSelect }) {
                     <div style={{
                       width:22, height:22, borderRadius:6, flexShrink:0,
                       border:`1.5px solid ${isSelected ? 'var(--p600)' : 'var(--p300)'}`,
-                      background: isSelected ? 'var(--p600)' : '#fff',
+                      background: isSelected ? 'var(--p600)' : 'rgba(255,255,255,.8)',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       transition:'all .15s',
                     }}>
                       {isSelected && <span style={{ color:'#fff', fontSize:12, fontWeight:700 }}>✓</span>}
                     </div>
                     <div>
-                      <div style={{ fontSize:14, fontWeight:500, color:'var(--p800)' }}>{svc.name}</div>
-                      <div style={{ fontSize:11, color:'var(--p500)', marginTop:2 }}>{svc.duration_mins} min</div>
+                      <div style={{ fontSize:14, fontWeight:600, color:'var(--p800)', textShadow:'0 1px 3px rgba(255,255,255,.8)' }}>{svc.name}</div>
+                      <div style={{ fontSize:11, color:'var(--p700)', marginTop:2 }}>{svc.duration_mins} min</div>
                     </div>
                   </div>
-                  <span style={{ fontSize:15, fontWeight:500, color:'var(--p700)', position:'relative', zIndex:1 }}>
+                  <span style={{ fontSize:15, fontWeight:600, color:'var(--p800)', position:'relative', zIndex:1, textShadow:'0 1px 3px rgba(255,255,255,.8)' }}>
                     {Number(svc.price).toFixed(0)} RSD
                   </span>
                 </button>
